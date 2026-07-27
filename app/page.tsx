@@ -222,6 +222,7 @@ function GlobeVisualization() {
         arcWidth: 0.55,
         arcHeight: 0.22,
         markerElevation: 0.018,
+        scale: 1.12,
         opacity: 0.97,
       });
       canvas.addEventListener("pointerdown", handlePointerDown);
@@ -366,18 +367,22 @@ export default function Home() {
                 <span><i className="blue-dot" />经销服务网点</span>
               </div>
               <div className="map-stage">
+                <div className="region-rail region-rail-left">
+                  <div className="region-card region-eu">
+                    <b>欧洲区域</b><span>客户数　--万</span><span>订单数　--万单</span>
+                  </div>
+                  <div className="region-card region-am">
+                    <b>美洲区域</b><span>客户数　--万</span><span>销售占比　--%</span>
+                  </div>
+                </div>
                 <GlobeVisualization />
-                <div className="region-card region-eu">
-                  <b>欧洲区域</b><span>客户数　--万</span><span>订单数　--万单</span>
-                </div>
-                <div className="region-card region-am">
-                  <b>美洲区域</b><span>客户数　--万</span><span>销售占比　--%</span>
-                </div>
-                <div className="region-card region-af">
-                  <b>非洲区域</b><span>客户数　--万</span><span>订单数　--万单</span>
-                </div>
-                <div className="region-card region-as">
-                  <b>亚洲区域</b><span>客户数　--万</span><span>订单数　--万单</span>
+                <div className="region-rail region-rail-right">
+                  <div className="region-card region-as">
+                    <b>亚洲区域</b><span>客户数　--万</span><span>订单数　--万单</span>
+                  </div>
+                  <div className="region-card region-af">
+                    <b>非洲区域</b><span>客户数　--万</span><span>订单数　--万单</span>
+                  </div>
                 </div>
               </div>
               <div className="market-ticker">

@@ -592,6 +592,11 @@ select {
 .map-stage {
   position: relative;
   height: 450px;
+  padding: 0 10px;
+  display: grid;
+  grid-template-columns: 155px minmax(0, 1fr) 155px;
+  align-items: stretch;
+  gap: 10px;
   overflow: hidden;
   border-radius: 7px;
   background:
@@ -603,8 +608,9 @@ select {
 }
 
 .globe-visualization {
-  position: absolute;
-  inset: 0;
+  position: relative;
+  min-width: 0;
+  height: 100%;
   display: grid;
   place-items: center;
 }
@@ -615,8 +621,8 @@ select {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 440px;
-  height: 440px;
+  width: 420px;
+  height: 420px;
   transform: translate(-50%, -50%);
   border: 1px solid rgba(74, 211, 255, 0.13);
   border-radius: 50%;
@@ -624,8 +630,8 @@ select {
 }
 
 .globe-visualization::after {
-  width: 510px;
-  height: 180px;
+  width: 500px;
+  height: 176px;
   border-color: rgba(74, 211, 255, 0.11);
   transform: translate(-50%, -50%) rotate(-8deg);
 }
@@ -633,8 +639,9 @@ select {
 .globe-canvas {
   position: relative;
   z-index: 1;
-  width: 570px;
-  height: 430px;
+  width: 440px;
+  height: 440px;
+  max-width: 100%;
   cursor: grab;
   touch-action: none;
   filter: saturate(1.25) drop-shadow(0 0 20px rgba(27, 171, 255, 0.34));
@@ -648,7 +655,7 @@ select {
   position: absolute;
   z-index: 2;
   left: 50%;
-  bottom: 22px;
+  bottom: 8px;
   transform: translateX(-50%);
   padding: 7px 15px;
   border: 1px solid rgba(64, 198, 255, 0.34);
@@ -680,9 +687,7 @@ select {
 }
 
 .region-card {
-  position: absolute;
-  z-index: 3;
-  width: 145px;
+  width: 100%;
   padding: 10px;
   display: flex;
   flex-direction: column;
@@ -695,15 +700,23 @@ select {
   font-size: 11px;
 }
 
+.region-rail {
+  position: relative;
+  z-index: 3;
+  padding: 12px 0 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
 .region-card b {
   color: var(--cyan);
   font-size: 14px;
 }
 
-.region-eu { left: 7px; top: 12px; }
-.region-am { left: 7px; bottom: 14px; border-color: #9d42d1; }
-.region-af { left: 355px; bottom: 0; border-color: #d9a451; }
-.region-as { right: 7px; top: 16px; border-color: #22c17b; }
+.region-am { border-color: #9d42d1; }
+.region-af { border-color: #d9a451; }
+.region-as { border-color: #22c17b; }
 
 .market-ticker {
   height: 90px;
