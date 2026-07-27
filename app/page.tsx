@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import type createGlobe from "cobe";
+import type { Arc, Marker } from "cobe";
+import { useEffect, useRef, useState } from "react";
 
 const DESIGN_WIDTH = 2048;
 const DESIGN_HEIGHT = 1875;
@@ -70,12 +72,18 @@ function useDashboardScale() {
 
 /** 将当前时间格式化为参考大屏使用的日期、时间和星期文本。 */
 function useClock() {
-  const [now, setNow] = useState(() => new Date());
+  const [now, setNow] = useState<Date | null>(null);
 
   useEffect(() => {
+    // 首次挂载后再读取本地时间，避免服务端与浏览器时区造成水合差异。
+    setNow(new Date());
     const timer = window.setInterval(() => setNow(new Date()), 1000);
     return () => window.clearInterval(timer);
   }, []);
+
+  if (!now) {
+    return { date: "---- -- --", time: "--:--:--", week: "星期-" };
+  }
 
   const pad = (value: number) => String(value).padStart(2, "0");
   const date = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
@@ -125,6 +133,132 @@ function Donut({ label }: { label: string }) {
   );
 }
 
+const globeMarkers: Marker[] = [
+  { location: [39.08, 117.2], size: 0.09, color: [1, 0.78, 0.32] },
+  { location: [51.51, -0.13], size: 0.055 },
+  { location: [40.71, -74], size: 0.055 },
+  { location: [-23.55, -46.63], size: 0.05 },
+  { location: [-26.2, 28.04], size: 0.05 },
+  { location: [-33.87, 151.21], size: 0.055 },
+  { location: [55.76, 37.62], size: 0.045 },
+  { location: [1.35, 103.82], size: 0.045 },
+];
+
+const globeArcs: Arc[] = globeMarkers.slice(1).map((marker) => ({
+  from: [39.08, 117.2],
+  to: marker.location,
+}));
+
+/** 创建可自动旋转和横向拖拽的 WebGL 地球，无输入参数与返回值。 */
+function GlobeVisualization() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const reducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    const devicePixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+    let phi = 2.45;
+    let pointerStart = 0;
+    let phiStart = phi;
+    let dragging = false;
+    let animationFrame = 0;
+    let disposed = false;
+    let globe: ReturnType<typeof createGlobe> | null = null;
+
+    const render = () => {
+      if (!globe) return;
+      if (!dragging && !reducedMotion) phi += 0.0023;
+      globe.update({
+        phi,
+        width: Math.round(canvas.clientWidth * devicePixelRatio),
+        height: Math.round(canvas.clientHeight * devicePixelRatio),
+      });
+      animationFrame = window.requestAnimationFrame(render);
+    };
+
+    const handlePointerDown = (event: PointerEvent) => {
+      dragging = true;
+      pointerStart = event.clientX;
+      phiStart = phi;
+      canvas.setPointerCapture(event.pointerId);
+    };
+    const handlePointerMove = (event: PointerEvent) => {
+      if (!dragging) return;
+      phi = phiStart + (event.clientX - pointerStart) / 145;
+    };
+    const handlePointerUp = (event: PointerEvent) => {
+      dragging = false;
+      if (canvas.hasPointerCapture(event.pointerId)) {
+        canvas.releasePointerCapture(event.pointerId);
+      }
+    };
+
+    const initializeGlobe = async () => {
+      // COBE 仅在浏览器端按需加载，保证静态导出环境不访问 window。
+      const { default: createGlobe } = await import("cobe");
+      if (disposed) return;
+
+      globe = createGlobe(canvas, {
+        width: Math.round(canvas.clientWidth * devicePixelRatio),
+        height: Math.round(canvas.clientHeight * devicePixelRatio),
+        devicePixelRatio,
+        phi,
+        theta: 0.22,
+        dark: 1,
+        diffuse: 1.35,
+        mapSamples: 18_000,
+        mapBrightness: 8,
+        mapBaseBrightness: 0.08,
+        baseColor: [0.02, 0.16, 0.32],
+        markerColor: [0.22, 0.9, 1],
+        glowColor: [0.05, 0.48, 0.78],
+        markers: globeMarkers,
+        arcs: globeArcs,
+        arcColor: [0.18, 0.78, 1],
+        arcWidth: 0.55,
+        arcHeight: 0.22,
+        markerElevation: 0.018,
+        opacity: 0.97,
+      });
+      canvas.addEventListener("pointerdown", handlePointerDown);
+      canvas.addEventListener("pointermove", handlePointerMove);
+      canvas.addEventListener("pointerup", handlePointerUp);
+      canvas.addEventListener("pointercancel", handlePointerUp);
+      render();
+    };
+    void initializeGlobe();
+
+    return () => {
+      disposed = true;
+      window.cancelAnimationFrame(animationFrame);
+      canvas.removeEventListener("pointerdown", handlePointerDown);
+      canvas.removeEventListener("pointermove", handlePointerMove);
+      canvas.removeEventListener("pointerup", handlePointerUp);
+      canvas.removeEventListener("pointercancel", handlePointerUp);
+      globe?.destroy();
+    };
+  }, []);
+
+  return (
+    <div className="globe-visualization">
+      <canvas
+        ref={canvasRef}
+        className="globe-canvas"
+        aria-label="可拖拽旋转的全球市场三维地球"
+      />
+      <div className="globe-core-label">
+        <i />
+        天津总部
+        <small>拖拽地球查看全球网络</small>
+      </div>
+    </div>
+  );
+}
+
 export default function Home() {
   const scale = useDashboardScale();
   const clock = useClock();
@@ -151,8 +285,8 @@ export default function Home() {
             <p>始于2007 · 服务全球健康市场　 弘扬养生文化，造福人类健康</p>
           </div>
           <time className="clock">
-            <strong>{clock.date} {clock.time}</strong>
-            <span>{clock.week}</span>
+            <strong suppressHydrationWarning>{clock.date} {clock.time}</strong>
+            <span suppressHydrationWarning>{clock.week}</span>
           </time>
         </header>
 
@@ -232,19 +366,7 @@ export default function Home() {
                 <span><i className="blue-dot" />经销服务网点</span>
               </div>
               <div className="map-stage">
-                <div className="map-placeholder">
-                  <span className="map-grid" />
-                  <div className="continent c1">北美洲</div>
-                  <div className="continent c2">南美洲</div>
-                  <div className="continent c3">欧洲</div>
-                  <div className="continent c4">非洲</div>
-                  <div className="continent c5">亚洲</div>
-                  <div className="continent c6">大洋洲</div>
-                  {Array.from({ length: 16 }).map((_, index) => (
-                    <i className={`map-dot dot-${index + 1}`} key={index} />
-                  ))}
-                  <div className="map-origin">天津总部</div>
-                </div>
+                <GlobeVisualization />
                 <div className="region-card region-eu">
                   <b>欧洲区域</b><span>客户数　--万</span><span>订单数　--万单</span>
                 </div>

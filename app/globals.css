@@ -595,103 +595,89 @@ select {
   overflow: hidden;
   border-radius: 7px;
   background:
-    radial-gradient(circle at 75% 43%, rgba(36, 211, 255, 0.18), transparent 25%),
-    radial-gradient(circle at 40% 48%, rgba(0, 105, 210, 0.2), transparent 40%),
+    linear-gradient(rgba(39, 164, 218, 0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(39, 164, 218, 0.045) 1px, transparent 1px),
+    radial-gradient(circle at 50% 48%, rgba(0, 105, 210, 0.21), transparent 45%),
     #03142b;
+  background-size: 42px 42px, 42px 42px, auto, auto;
 }
 
-.map-placeholder {
+.globe-visualization {
   position: absolute;
   inset: 0;
-  overflow: hidden;
-  opacity: 0.95;
-}
-
-.map-grid {
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(rgba(39, 164, 218, 0.09) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(39, 164, 218, 0.08) 1px, transparent 1px);
-  background-size: 47px 47px;
-  transform: perspective(450px) rotateX(64deg) scale(1.45);
-  transform-origin: bottom;
-}
-
-.map-placeholder::before,
-.map-placeholder::after {
-  content: "";
-  position: absolute;
-  border: 1px solid rgba(57, 193, 255, 0.16);
-  border-radius: 50%;
-}
-
-.map-placeholder::before {
-  inset: 100px 170px;
-}
-
-.map-placeholder::after {
-  inset: 155px 290px;
-}
-
-.continent {
-  position: absolute;
   display: grid;
   place-items: center;
-  border: 1px solid rgba(75, 222, 255, 0.35);
-  border-radius: 48% 42% 54% 39%;
-  color: rgba(192, 241, 255, 0.72);
-  background: linear-gradient(135deg, rgba(33, 139, 218, 0.68), rgba(24, 214, 215, 0.46));
-  box-shadow: 0 0 24px rgba(29, 172, 244, 0.25);
-  font-size: 15px;
-  text-shadow: 0 0 8px #032143;
-  transform: rotate(-6deg);
 }
 
-.c1 { left: 15%; top: 18%; width: 210px; height: 115px; }
-.c2 { left: 29%; top: 49%; width: 112px; height: 180px; transform: rotate(19deg); background: linear-gradient(135deg, #6f43bd, #234ba6); }
-.c3 { left: 47%; top: 20%; width: 106px; height: 74px; }
-.c4 { left: 49%; top: 40%; width: 140px; height: 175px; transform: rotate(8deg); background: linear-gradient(135deg, #d09b49, #8e5e43); }
-.c5 { left: 55%; top: 19%; width: 325px; height: 170px; transform: rotate(4deg); background: linear-gradient(135deg, #3196d1, #42c9c2); }
-.c6 { left: 79%; top: 65%; width: 116px; height: 68px; background: linear-gradient(135deg, #2b93d5, #525fc0); }
-
-.map-origin {
-  position: absolute;
-  left: 76%;
-  top: 39%;
-  color: #fff;
-  font-size: 13px;
-  text-shadow: 0 0 12px #fff;
-}
-
-.map-origin::before {
+.globe-visualization::before,
+.globe-visualization::after {
   content: "";
-  display: inline-block;
-  width: 13px;
-  height: 13px;
-  margin-right: 6px;
-  border-radius: 50%;
-  background: #fff;
-  box-shadow: 0 0 20px 7px #46f3ff;
-}
-
-.map-dot {
   position: absolute;
-  width: 7px;
-  height: 7px;
+  left: 50%;
+  top: 50%;
+  width: 440px;
+  height: 440px;
+  transform: translate(-50%, -50%);
+  border: 1px solid rgba(74, 211, 255, 0.13);
   border-radius: 50%;
-  background: #75efff;
-  box-shadow: 0 0 10px 3px #22b8ff;
+  pointer-events: none;
 }
 
-.dot-1 { left: 21%; top: 37%; }.dot-2 { left: 27%; top: 31%; }
-.dot-3 { left: 34%; top: 54%; }.dot-4 { left: 37%; top: 70%; }
-.dot-5 { left: 48%; top: 31%; }.dot-6 { left: 52%; top: 25%; }
-.dot-7 { left: 56%; top: 41%; }.dot-8 { left: 61%; top: 48%; }
-.dot-9 { left: 66%; top: 38%; }.dot-10 { left: 71%; top: 54%; }
-.dot-11 { left: 76%; top: 30%; }.dot-12 { left: 83%; top: 43%; }
-.dot-13 { left: 88%; top: 65%; }.dot-14 { left: 44%; top: 57%; }
-.dot-15 { left: 59%; top: 69%; }.dot-16 { left: 30%; top: 64%; }
+.globe-visualization::after {
+  width: 510px;
+  height: 180px;
+  border-color: rgba(74, 211, 255, 0.11);
+  transform: translate(-50%, -50%) rotate(-8deg);
+}
+
+.globe-canvas {
+  position: relative;
+  z-index: 1;
+  width: 570px;
+  height: 430px;
+  cursor: grab;
+  touch-action: none;
+  filter: saturate(1.25) drop-shadow(0 0 20px rgba(27, 171, 255, 0.34));
+}
+
+.globe-canvas:active {
+  cursor: grabbing;
+}
+
+.globe-core-label {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  bottom: 22px;
+  transform: translateX(-50%);
+  padding: 7px 15px;
+  border: 1px solid rgba(64, 198, 255, 0.34);
+  border-radius: 20px;
+  color: #fff;
+  background: rgba(1, 26, 54, 0.78);
+  box-shadow: 0 0 14px rgba(19, 162, 238, 0.18);
+  font-size: 12px;
+  text-align: center;
+  pointer-events: none;
+}
+
+.globe-core-label i {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 7px;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 0 10px 3px rgba(255, 211, 120, 0.65);
+}
+
+.globe-core-label small {
+  display: block;
+  margin-top: 3px;
+  color: #6da8c8;
+  font-size: 9px;
+  letter-spacing: 1px;
+}
 
 .region-card {
   position: absolute;
