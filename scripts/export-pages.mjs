@@ -84,10 +84,21 @@ async function exportGitHubPages() {
   await mkdir(pagesRoot, { recursive: true });
   await writeFile(new URL("index.html", pagesRoot), html, "utf8");
   await writeFile(new URL(".nojekyll", pagesRoot), "", "utf8");
-  await copyFile(
-    new URL("../public/og.png", import.meta.url),
-    new URL("og.png", pagesRoot),
-  );
+  try {
+    await copyFile(
+      new URL("../public/og.png", import.meta.url),
+      new URL("og.png", pagesRoot),
+    );
+  } catch (error) {
+    if (error.code !== "ENOENT") throw error;
+    // 远端精简源码不携带大图时，保留一个有效 PNG，避免分享图片地址返回 404。
+    const fallbackPng =
+      "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=";
+    await writeFile(
+      new URL("og.png", pagesRoot),
+      Buffer.from(fallbackPng, "base64"),
+    );
+  }
 }
 
 await exportGitHubPages();
