@@ -60,6 +60,10 @@ async function exportGitHubPages() {
   await cp(clientAssets, new URL("assets/", pagesRoot), { recursive: true });
   await writeFile(new URL("index.html", pagesRoot), html, "utf8");
   await writeFile(new URL(".nojekyll", pagesRoot), "", "utf8");
+  await copyFile(
+    new URL("../public/earth-night.jpg", import.meta.url),
+    new URL("earth-night.jpg", pagesRoot),
+  );
   try {
     await copyFile(
       new URL("../public/og.png", import.meta.url),

@@ -642,9 +642,14 @@ select {
   width: 440px;
   height: 440px;
   max-width: 100%;
+  overflow: visible;
   cursor: grab;
   touch-action: none;
   filter: saturate(1.25) drop-shadow(0 0 20px rgba(27, 171, 255, 0.34));
+}
+
+.globe-canvas > canvas {
+  display: block;
 }
 
 .globe-canvas:active {

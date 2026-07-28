@@ -1,7 +1,5 @@
 "use client";
 
-import type createGlobe from "cobe";
-import type { Arc, Marker } from "cobe";
 import { useEffect, useRef, useState } from "react";
 
 const DESIGN_WIDTH = 2048;
@@ -133,121 +131,144 @@ function Donut({ label }: { label: string }) {
   );
 }
 
-const globeMarkers: Marker[] = [
-  { location: [39.08, 117.2], size: 0.09, color: [1, 0.78, 0.32] },
-  { location: [51.51, -0.13], size: 0.055 },
-  { location: [40.71, -74], size: 0.055 },
-  { location: [-23.55, -46.63], size: 0.05 },
-  { location: [-26.2, 28.04], size: 0.05 },
-  { location: [-33.87, 151.21], size: 0.055 },
-  { location: [55.76, 37.62], size: 0.045 },
-  { location: [1.35, 103.82], size: 0.045 },
+type GlobePoint = {
+  lat: number;
+  lng: number;
+  name: string;
+  color: string;
+};
+
+type GlobeArc = {
+  startLat: number;
+  startLng: number;
+  endLat: number;
+  endLng: number;
+  color: string[];
+};
+
+type CountryFeature = {
+  id?: string | number;
+  properties?: { name?: string };
+  geometry: object;
+};
+
+const globePoints: GlobePoint[] = [
+  { lat: 39.08, lng: 117.2, name: "天津总部", color: "#ffd778" },
+  { lat: 51.51, lng: -0.13, name: "伦敦", color: "#33dcff" },
+  { lat: 40.71, lng: -74, name: "纽约", color: "#33dcff" },
+  { lat: -23.55, lng: -46.63, name: "圣保罗", color: "#33dcff" },
+  { lat: -26.2, lng: 28.04, name: "约翰内斯堡", color: "#33dcff" },
+  { lat: -33.87, lng: 151.21, name: "悉尼", color: "#33dcff" },
+  { lat: 55.76, lng: 37.62, name: "莫斯科", color: "#33dcff" },
+  { lat: 1.35, lng: 103.82, name: "新加坡", color: "#33dcff" },
 ];
 
-const globeArcs: Arc[] = globeMarkers.slice(1).map((marker) => ({
-  from: [39.08, 117.2],
-  to: marker.location,
+const globeArcs: GlobeArc[] = globePoints.slice(1).map((point) => ({
+  startLat: globePoints[0].lat,
+  startLng: globePoints[0].lng,
+  endLat: point.lat,
+  endLng: point.lng,
+  color: ["rgba(42, 215, 255, 0.18)", "rgba(42, 215, 255, 0.95)"],
 }));
 
-/** 创建可自动旋转和横向拖拽的 WebGL 地球，无输入参数与返回值。 */
+/** 创建带国家边界、夜景纹理和全球飞线的 Three.js 地球，无输入参数与返回值。 */
 function GlobeVisualization() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const globeRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+    const container = globeRef.current;
+    if (!container) return;
 
     const reducedMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;
-    const devicePixelRatio = Math.min(window.devicePixelRatio || 1, 2);
-    let phi = 2.45;
-    let pointerStart = 0;
-    let phiStart = phi;
-    let dragging = false;
-    let animationFrame = 0;
     let disposed = false;
-    let globe: ReturnType<typeof createGlobe> | null = null;
-
-    const render = () => {
-      if (!globe) return;
-      if (!dragging && !reducedMotion) phi += 0.0023;
-      globe.update({
-        phi,
-        width: Math.round(canvas.clientWidth * devicePixelRatio),
-        height: Math.round(canvas.clientHeight * devicePixelRatio),
-      });
-      animationFrame = window.requestAnimationFrame(render);
-    };
-
-    const handlePointerDown = (event: PointerEvent) => {
-      dragging = true;
-      pointerStart = event.clientX;
-      phiStart = phi;
-      canvas.setPointerCapture(event.pointerId);
-    };
-    const handlePointerMove = (event: PointerEvent) => {
-      if (!dragging) return;
-      phi = phiStart + (event.clientX - pointerStart) / 145;
-    };
-    const handlePointerUp = (event: PointerEvent) => {
-      dragging = false;
-      if (canvas.hasPointerCapture(event.pointerId)) {
-        canvas.releasePointerCapture(event.pointerId);
-      }
-    };
+    let globe: import("globe.gl").GlobeInstance | null = null;
 
     const initializeGlobe = async () => {
-      // COBE 仅在浏览器端按需加载，保证静态导出环境不访问 window。
-      const { default: createGlobe } = await import("cobe");
+      // 地球引擎和国家数据仅在浏览器端加载，避免静态导出阶段访问 WebGL。
+      const [{ default: Globe }, { feature }, atlasModule] = await Promise.all([
+        import("globe.gl"),
+        import("topojson-client"),
+        import("world-atlas/countries-110m.json"),
+      ]);
       if (disposed) return;
 
-      globe = createGlobe(canvas, {
-        width: Math.round(canvas.clientWidth * devicePixelRatio),
-        height: Math.round(canvas.clientHeight * devicePixelRatio),
-        devicePixelRatio,
-        phi,
-        theta: 0.22,
-        dark: 1,
-        diffuse: 1.35,
-        mapSamples: 18_000,
-        mapBrightness: 8,
-        mapBaseBrightness: 0.08,
-        baseColor: [0.02, 0.16, 0.32],
-        markerColor: [0.22, 0.9, 1],
-        glowColor: [0.05, 0.48, 0.78],
-        markers: globeMarkers,
-        arcs: globeArcs,
-        arcColor: [0.18, 0.78, 1],
-        arcWidth: 0.55,
-        arcHeight: 0.22,
-        markerElevation: 0.018,
-        scale: 1.12,
-        opacity: 0.97,
-      });
-      canvas.addEventListener("pointerdown", handlePointerDown);
-      canvas.addEventListener("pointermove", handlePointerMove);
-      canvas.addEventListener("pointerup", handlePointerUp);
-      canvas.addEventListener("pointercancel", handlePointerUp);
-      render();
+      const atlas = atlasModule.default;
+      const countries = feature(
+        atlas as never,
+        atlas.objects.countries as never,
+      ) as unknown as { features: CountryFeature[] };
+
+      globe = new Globe(container, {
+        animateIn: false,
+        rendererConfig: { alpha: true, antialias: true },
+      })
+        .width(440)
+        .height(440)
+        .backgroundColor("rgba(0, 0, 0, 0)")
+        .globeImageUrl("./earth-night.jpg")
+        .showGraticules(true)
+        .showAtmosphere(true)
+        .atmosphereColor("#00b9ff")
+        .atmosphereAltitude(0.16)
+        .polygonsData(countries.features)
+        .polygonCapColor((item) =>
+          String((item as CountryFeature).id) === "156"
+            ? "rgba(20, 188, 255, 0.48)"
+            : "rgba(8, 76, 126, 0.2)",
+        )
+        .polygonSideColor(() => "rgba(7, 52, 91, 0.18)")
+        .polygonStrokeColor(() => "rgba(94, 222, 255, 0.68)")
+        .polygonAltitude(0.007)
+        .polygonLabel(
+          (item) => (item as CountryFeature).properties?.name ?? "国家/地区",
+        )
+        .polygonsTransitionDuration(0)
+        .pointsData(globePoints)
+        .pointLat("lat")
+        .pointLng("lng")
+        .pointColor("color")
+        .pointRadius((item) =>
+          (item as GlobePoint).name === "天津总部" ? 0.42 : 0.25,
+        )
+        .pointAltitude(0.025)
+        .pointLabel("name")
+        .pointsTransitionDuration(0)
+        .arcsData(globeArcs)
+        .arcStartLat("startLat")
+        .arcStartLng("startLng")
+        .arcEndLat("endLat")
+        .arcEndLng("endLng")
+        .arcColor("color")
+        .arcStroke(0.52)
+        .arcAltitudeAutoScale(0.32)
+        .arcDashLength(0.42)
+        .arcDashGap(0.18)
+        .arcDashAnimateTime(2_200)
+        .arcsTransitionDuration(0)
+        .pointOfView({ lat: 24, lng: 108, altitude: 1.72 }, 0);
+
+      const controls = globe.controls();
+      controls.autoRotate = !reducedMotion;
+      controls.autoRotateSpeed = 0.42;
+      controls.enablePan = false;
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.08;
     };
     void initializeGlobe();
 
     return () => {
       disposed = true;
-      window.cancelAnimationFrame(animationFrame);
-      canvas.removeEventListener("pointerdown", handlePointerDown);
-      canvas.removeEventListener("pointermove", handlePointerMove);
-      canvas.removeEventListener("pointerup", handlePointerUp);
-      canvas.removeEventListener("pointercancel", handlePointerUp);
-      globe?.destroy();
+      globe?._destructor();
+      container.replaceChildren();
     };
   }, []);
 
   return (
     <div className="globe-visualization">
-      <canvas
-        ref={canvasRef}
+      <div
+        ref={globeRef}
         className="globe-canvas"
         aria-label="可拖拽旋转的全球市场三维地球"
       />
