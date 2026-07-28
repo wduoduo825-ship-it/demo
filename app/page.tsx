@@ -9,6 +9,7 @@ import {
   factoryFacts,
   honorItems,
   honorTimeline,
+  honorWallItems,
   metrics,
   overview,
   productGroups,
@@ -47,10 +48,13 @@ function useClock() {
   const [now, setNow] = useState<Date | null>(null);
 
   useEffect(() => {
-    // 首次挂载后再读取本地时间，避免服务端与浏览器时区造成水合差异。
-    setNow(new Date());
+    // 首帧后再读取本地时间，避免服务端与浏览器时区造成水合差异。
+    const frame = window.requestAnimationFrame(() => setNow(new Date()));
     const timer = window.setInterval(() => setNow(new Date()), 1000);
-    return () => window.clearInterval(timer);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.clearInterval(timer);
+    };
   }, []);
 
   if (!now) {
@@ -135,9 +139,9 @@ type CountryFeature = {
 
 const globePoints: GlobePoint[] = [
   { lat: 39.08, lng: 117.2, name: "天津总部", color: "#ffd778" },
-  { lat: 50, lng: 15, name: "欧洲业务覆盖", color: "#33dcff" },
-  { lat: 12, lng: -78, name: "美洲业务覆盖", color: "#33dcff" },
-  { lat: 2, lng: 21, name: "非洲业务覆盖", color: "#33dcff" },
+  { lat: 55.17, lng: 23.88, name: "立陶宛", color: "#33dcff" },
+  { lat: 39.5, lng: -98.35, name: "北美洲", color: "#33dcff" },
+  { lat: 5.2, lng: 20.1, name: "非洲", color: "#33dcff" },
 ];
 
 const globeArcs: GlobeArc[] = globePoints.slice(1).map((point) => ({
@@ -154,6 +158,24 @@ const globeMarkers: GlobeMarker[] = [
     lng: 117.2,
     name: "天津总部",
     description: "全球运营总部",
+  },
+  {
+    lat: 55.17,
+    lng: 23.88,
+    name: "立陶宛",
+    description: "欧洲业务覆盖",
+  },
+  {
+    lat: 5.2,
+    lng: 20.1,
+    name: "非洲",
+    description: "业务覆盖区域",
+  },
+  {
+    lat: 39.5,
+    lng: -98.35,
+    name: "北美洲",
+    description: "业务覆盖区域",
   },
 ];
 
@@ -245,8 +267,11 @@ function GlobeVisualization() {
           const label = document.createElement("strong");
           const description = document.createElement("small");
 
-          // HTML 标注由地球引擎绑定经纬度，旋转时始终贴合天津坐标。
-          element.className = "globe-marker";
+          // HTML 标注由地球引擎绑定经纬度，旋转时始终贴合对应坐标。
+          element.className =
+            marker.name === "天津总部"
+              ? "globe-marker headquarters"
+              : "globe-marker coverage-marker";
           dot.className = "globe-marker-dot";
           connector.className = "globe-marker-connector";
           label.className = "globe-marker-label";
@@ -285,6 +310,25 @@ function GlobeVisualization() {
         className="globe-canvas"
         aria-label="可拖拽旋转的全球市场三维地球"
       />
+    </div>
+  );
+}
+
+/** 渲染可无缝循环的荣誉列表，输入来自公开荣誉配置，无业务数据副作用。 */
+function HonorWall() {
+  const loopItems = [...honorWallItems, ...honorWallItems];
+
+  return (
+    <div className="honor-marquee" aria-label="企业荣誉自动滚动列表">
+      <div className="honor-track">
+        {loopItems.map(([icon, title, category], index) => (
+          <div className="honor-item" key={`${title}-${index}`}>
+            <i>{icon}</i>
+            <span>{title}</span>
+            <b>{category}</b>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -534,11 +578,7 @@ export default function Home() {
 
           <div className="bottom-right">
             <Panel title="荣誉墙（官网公开29条记录）" className="honor-panel">
-              <div className="honor-row">
-                {["国家高新技术企业", "新领军者创新奖", "便携舒络仪科技金奖", "中国保健协会副理事长单位"].map((item, index) => (
-                  <div key={item}><i>{["♕", "♛", "♜", "♔"][index]}</i><span>{item}</span></div>
-                ))}
-              </div>
+              <HonorWall />
             </Panel>
             <Panel title="公益与社会责任" className="charity-panel">
               <div className="charity-content">
