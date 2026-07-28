@@ -656,39 +656,73 @@ select {
   cursor: grabbing;
 }
 
-.globe-core-label {
-  position: absolute;
-  z-index: 2;
-  left: 50%;
-  bottom: 8px;
-  transform: translateX(-50%);
-  padding: 7px 15px;
-  border: 1px solid rgba(64, 198, 255, 0.34);
-  border-radius: 20px;
-  color: #fff;
-  background: rgba(1, 26, 54, 0.78);
-  box-shadow: 0 0 14px rgba(19, 162, 238, 0.18);
-  font-size: 12px;
-  text-align: center;
+.globe-marker {
+  position: relative;
+  z-index: 3;
+  width: 0;
+  height: 0;
+  color: #f8fdff;
   pointer-events: none;
+  transition: opacity 160ms ease;
 }
 
-.globe-core-label i {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  margin-right: 7px;
+.globe-marker.is-hidden {
+  opacity: 0;
+}
+
+.globe-marker-dot {
+  position: absolute;
+  left: -5px;
+  top: -5px;
+  width: 10px;
+  height: 10px;
+  border: 2px solid #fff3ba;
   border-radius: 50%;
-  background: var(--gold);
-  box-shadow: 0 0 10px 3px rgba(255, 211, 120, 0.65);
+  background: #ffc857;
+  box-shadow:
+    0 0 8px 3px rgba(255, 208, 91, 0.92),
+    0 0 20px 7px rgba(255, 188, 60, 0.32);
 }
 
-.globe-core-label small {
+.globe-marker-connector {
+  position: absolute;
+  left: 3px;
+  top: -2px;
+  width: 38px;
+  height: 1px;
+  transform: rotate(-35deg);
+  transform-origin: left center;
+  background: linear-gradient(90deg, #ffe38f, #37d9ff);
+  box-shadow: 0 0 6px rgba(53, 215, 255, 0.75);
+}
+
+.globe-marker-label {
+  position: absolute;
+  left: 33px;
+  top: -43px;
+  min-width: 88px;
+  padding: 6px 10px 5px;
+  border: 1px solid rgba(72, 220, 255, 0.92);
+  border-radius: 3px;
+  color: #fff4c4;
+  background: rgba(2, 26, 53, 0.94);
+  box-shadow:
+    inset 0 0 12px rgba(28, 173, 238, 0.24),
+    0 0 10px rgba(25, 180, 249, 0.3);
+  font-size: 13px;
+  font-style: normal;
+  line-height: 1.25;
+  white-space: nowrap;
+  text-shadow: 0 0 7px rgba(255, 211, 91, 0.72);
+}
+
+.globe-marker-label small {
   display: block;
-  margin-top: 3px;
-  color: #6da8c8;
+  margin-top: 2px;
+  color: #76cce9;
   font-size: 9px;
-  letter-spacing: 1px;
+  font-weight: 400;
+  text-shadow: none;
 }
 
 .region-card {

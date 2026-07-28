@@ -146,6 +146,13 @@ type GlobeArc = {
   color: string[];
 };
 
+type GlobeMarker = {
+  lat: number;
+  lng: number;
+  name: string;
+  description: string;
+};
+
 type CountryFeature = {
   id?: string | number;
   properties?: { name?: string };
@@ -170,6 +177,15 @@ const globeArcs: GlobeArc[] = globePoints.slice(1).map((point) => ({
   endLng: point.lng,
   color: ["rgba(42, 215, 255, 0.18)", "rgba(42, 215, 255, 0.95)"],
 }));
+
+const globeMarkers: GlobeMarker[] = [
+  {
+    lat: 39.08,
+    lng: 117.2,
+    name: "天津总部",
+    description: "全球运营总部",
+  },
+];
 
 /** 创建带国家边界、夜景纹理和全球飞线的 Three.js 地球，无输入参数与返回值。 */
 function GlobeVisualization() {
@@ -247,6 +263,33 @@ function GlobeVisualization() {
         .arcDashGap(0.18)
         .arcDashAnimateTime(2_200)
         .arcsTransitionDuration(0)
+        .htmlElementsData(globeMarkers)
+        .htmlLat("lat")
+        .htmlLng("lng")
+        .htmlAltitude(0.045)
+        .htmlElement((item) => {
+          const marker = item as GlobeMarker;
+          const element = document.createElement("div");
+          const dot = document.createElement("i");
+          const connector = document.createElement("span");
+          const label = document.createElement("strong");
+          const description = document.createElement("small");
+
+          // HTML 标注由地球引擎绑定经纬度，旋转时始终贴合天津坐标。
+          element.className = "globe-marker";
+          dot.className = "globe-marker-dot";
+          connector.className = "globe-marker-connector";
+          label.className = "globe-marker-label";
+          label.textContent = marker.name;
+          description.textContent = marker.description;
+          label.append(description);
+          element.append(dot, connector, label);
+          return element;
+        })
+        .htmlElementVisibilityModifier((element, isVisible) => {
+          element.classList.toggle("is-hidden", !isVisible);
+        })
+        .htmlTransitionDuration(0)
         .pointOfView({ lat: 24, lng: 108, altitude: 1.72 }, 0);
 
       const controls = globe.controls();
@@ -272,11 +315,6 @@ function GlobeVisualization() {
         className="globe-canvas"
         aria-label="可拖拽旋转的全球市场三维地球"
       />
-      <div className="globe-core-label">
-        <i />
-        天津总部
-        <small>拖拽地球查看全球网络</small>
-      </div>
     </div>
   );
 }
