@@ -6,14 +6,11 @@ import {
   cultureItems,
   developmentMilestones,
   factoryFacts,
-  honorItems,
-  honorTimeline,
   honorWallItems,
   metrics,
   overview,
   productGroups,
   regions,
-  researchItems,
   trainingItems,
   type DashboardAsset,
 } from "./foherb-content";
@@ -210,8 +207,8 @@ function GlobeVisualization() {
         animateIn: false,
         rendererConfig: { alpha: true, antialias: true },
       })
-        .width(440)
-        .height(440)
+        .width(620)
+        .height(620)
         .backgroundColor("rgba(0, 0, 0, 0)")
         .globeImageUrl("./earth-night.jpg")
         .showGraticules(true)
@@ -466,77 +463,41 @@ export default function Home() {
               </div>
             </Panel>
 
-            <Panel title="智能制造与生产基地" className="factory-panel">
-              <div className="factory-content">
-                <MediaFrame asset={assets.factoryRobot} className="factory-photo" />
-                <div className="factory-stats">
-                  {factoryFacts.map(([label, value]) => (
-                    <div key={label}><span>{label}</span><b>{value}</b></div>
-                  ))}
-                </div>
-                <div className="production">
-                  <h3>生产流程</h3>
-                  <div className="process-flow">
-                    {["原料检测", "生产制造", "质量控制", "成品检验", "仓储物流"].map((item, index) => (
-                      <div className="flow-item" key={item}>
-                        <i>⌬</i><span>{item}</span>{index < 4 && <b>→</b>}
-                      </div>
-                    ))}
-                  </div>
-                  <div className="factory-images">
-                    <MediaFrame asset={assets.factoryLine} />
-                    <MediaFrame asset={assets.factoryRobot} />
-                    <MediaFrame asset={assets.deviceLine} />
-                  </div>
-                </div>
-              </div>
-            </Panel>
           </div>
 
           <div className="right-column">
-            <Panel title="研发与科技实力" className="research-panel">
-              <h3 className="subhead">研发体系</h3>
-              <div className="research-flow">
-                {["综合研发中心", "检测化验中心", "试制中心"].map((item, index) => (
-                  <div className="research-node" key={item}>
-                    <i>♙</i><span>{item}</span>{index < 2 && <b>→</b>}
-                  </div>
+            <Panel title="智能制造与生产基地" className="factory-base-panel">
+              <MediaFrame asset={assets.factoryRobot} className="factory-base-photo" />
+              <div className="factory-stats">
+                {factoryFacts.map(([label, value]) => (
+                  <div key={label}><span>{label}</span><b>{value}</b></div>
                 ))}
               </div>
-              <div className="core-team">
-                <b>核心研发团队</b>
-                <p>中医养生专家｜生物学家｜研发工程师</p>
+              <div className="factory-system">
+                <strong>智能制造体系</strong>
+                <span>自动化生产</span>
+                <span>质量体系把关</span>
+                <span>现代仓储物流</span>
               </div>
-              <h3 className="subhead">产学研合作院校</h3>
-              <div className="school-row">
-                {["白俄罗斯维捷布斯克国立医药大学", "天津科技大学", "天津农学院"].map((item) => (
-                  <div key={item}><i>◎</i><span>{item}</span></div>
-                ))}
-              </div>
-              <h3 className="subhead">科技资质</h3>
-              <ul className="check-list">
-                {researchItems.map((item) => <li key={item}>✓　{item}</li>)}
-              </ul>
             </Panel>
 
-            <Panel title="企业荣誉与科技资质" className="patent-panel">
-              <div className="patent-top">
-                <ul className="patent-list">
-                  {honorItems.map((item, index) => (
-                    <li key={item}><i style={{ background: `var(--chart-${index + 1})` }} />{item}</li>
-                  ))}
-                </ul>
-                <MediaFrame asset={assets.worldEconomicForumHonor} className="honor-certificate" />
-              </div>
-              <h3 className="subhead">代表性荣誉节点</h3>
-              <div className="honor-timeline">
-                {honorTimeline.map(([year, event]) => (
-                  <div key={year}>
-                    <i />
-                    <span>{year}</span>
-                    <b>{event}</b>
+            <Panel title="生产流程" className="production-panel">
+              <div className="process-flow">
+                {["原料检测", "生产制造", "质量控制", "成品检验", "仓储物流"].map((item, index) => (
+                  <div className="flow-item" key={item}>
+                    <i>⌬</i><span>{item}</span>{index < 4 && <b>→</b>}
                   </div>
                 ))}
+              </div>
+              <div className="factory-images">
+                <MediaFrame asset={assets.factoryLine} />
+                <MediaFrame asset={assets.factoryRobot} />
+                <MediaFrame asset={assets.deviceLine} />
+              </div>
+              <div className="production-quality">
+                <div><b>ISO 9001</b><span>质量管理体系</span></div>
+                <div><b>HACCP</b><span>食品安全体系</span></div>
+                <div><b>多条</b><span>自动化生产线</span></div>
               </div>
             </Panel>
           </div>

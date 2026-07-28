@@ -12,7 +12,6 @@ test("renders the exported health industry dashboard", async () => {
   assert.match(html, /全球市场版图/);
   assert.match(html, /class="globe-canvas"/);
   assert.match(html, /智能制造与生产基地/);
-  assert.match(html, /研发与科技实力/);
   assert.match(html, /产品矩阵/);
   assert.match(html, /\/demo\/assets\/page-[\w-]+\.js/);
   assert.doesNotMatch(html, /codex-preview|react-loading-skeleton/i);
@@ -31,4 +30,16 @@ test("renders the exported health industry dashboard", async () => {
   ]) {
     assert.ok(foherbAssets.includes(asset), `missing exported asset: ${asset}`);
   }
+
+  // 验证客户端实际渲染的新布局，避免旧静态骨架掩盖模块替换结果。
+  const pageAssets = await readdir(new URL("../pages/assets/", import.meta.url));
+  const pageBundle = pageAssets.find((asset) => /^page-.+\.js$/.test(asset));
+  assert.ok(pageBundle, "missing exported page bundle");
+  const pageCode = await readFile(
+    new URL(`../pages/assets/${pageBundle}`, import.meta.url),
+    "utf8",
+  );
+  assert.match(pageCode, /智能制造与生产基地/);
+  assert.match(pageCode, /生产流程/);
+  assert.doesNotMatch(pageCode, /研发与科技实力|企业荣誉与科技资质/);
 });
