@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 import {
   assets,
-  charityMilestones,
   cultureItems,
   developmentMilestones,
   factoryFacts,
@@ -15,7 +14,6 @@ import {
   productGroups,
   regions,
   researchItems,
-  strategyGoals,
   trainingItems,
   type DashboardAsset,
 } from "./foherb-content";
@@ -314,7 +312,7 @@ function GlobeVisualization() {
   );
 }
 
-/** 渲染可无缝循环的荣誉列表，输入来自公开荣誉配置，无业务数据副作用。 */
+/** 渲染可无缝纵向循环的荣誉列表，输入来自公开荣誉配置，无业务数据副作用。 */
 function HonorWall() {
   const loopItems = [...honorWallItems, ...honorWallItems];
 
@@ -561,36 +559,9 @@ export default function Home() {
             </div>
           </Panel>
 
-          <Panel title="和治友德2035战略规划目标" className="service-panel">
-            <div className="service-layout">
-              <div className="strategy-list">
-                {strategyGoals.map(([stage, goal]) => (
-                  <div key={stage}><strong>{stage}</strong><span>{goal}</span></div>
-                ))}
-              </div>
-              <div className="service-icons">
-                {["客户服务能力", "研发品控能力", "人才培训能力", "物流配送能力"].map((item) => (
-                  <div key={item}><i>♙</i><span>{item}</span><b>提质升级</b></div>
-                ))}
-              </div>
-            </div>
+          <Panel title="荣誉墙（官网公开29条记录）" className="honor-panel">
+            <HonorWall />
           </Panel>
-
-          <div className="bottom-right">
-            <Panel title="荣誉墙（官网公开29条记录）" className="honor-panel">
-              <HonorWall />
-            </Panel>
-            <Panel title="公益与社会责任" className="charity-panel">
-              <div className="charity-content">
-                <MediaFrame asset={assets.charity2020} className="charity-photo" />
-                <div className="charity-timeline">
-                  {charityMilestones.map(([year, event]) => (
-                    <p key={year}><b>{year}年</b>　{event}</p>
-                  ))}
-                </div>
-              </div>
-            </Panel>
-          </div>
         </section>
 
         <footer className="footer">
