@@ -64,6 +64,13 @@ async function exportGitHubPages() {
     new URL("../public/earth-night.jpg", import.meta.url),
     new URL("earth-night.jpg", pagesRoot),
   );
+  // 将已授权的企业本地素材一并导出，GitHub Pages 不依赖官网热链。
+  await rm(new URL("foherb/", pagesRoot), { recursive: true, force: true });
+  await cp(
+    new URL("../public/foherb/", import.meta.url),
+    new URL("foherb/", pagesRoot),
+    { recursive: true },
+  );
   try {
     await copyFile(
       new URL("../public/og.png", import.meta.url),

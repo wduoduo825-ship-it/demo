@@ -1,52 +1,26 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import {
+  assets,
+  charityMilestones,
+  cultureItems,
+  developmentMilestones,
+  factoryFacts,
+  honorItems,
+  honorTimeline,
+  metrics,
+  overview,
+  productGroups,
+  regions,
+  researchItems,
+  strategyGoals,
+  trainingItems,
+  type DashboardAsset,
+} from "./foherb-content";
 
 const DESIGN_WIDTH = 2048;
 const DESIGN_HEIGHT = 1875;
-
-const metrics = [
-  ["⌂", "2007年", "企业创立"],
-  ["▣", "近19年", "发展历程"],
-  ["◉", "4大洲", "全球市场"],
-  ["◇", "4大类", "产品体系"],
-  ["▥", "25,928㎡", "生产基地面积"],
-  ["▦", "32,970.6㎡", "全球运营总部占地"],
-  ["⌁", "3所", "研发合作院校"],
-  ["♜", "29项", "企业荣誉"],
-];
-
-const overview = [
-  ["⌂", "成立时间", "2007年"],
-  ["▱", "企业类型", "集研发、生产、销售健康护理产品于一体"],
-  ["♧", "企业定位", "全球化个人经济体创业赋能平台"],
-  ["◎", "企业使命", "弘扬养生文化，造福人类健康"],
-  ["✤", "核心竞争力", "理念、产品、模式“三力一体”"],
-  ["⌘", "注册资本", "8,000万元"],
-];
-
-const people = [
-  ["全球员工总数", "--人"],
-  ["博士、硕士及以上", "--人"],
-  ["研发及专业人员占比", "--%"],
-  ["高学历人才占比", "--%"],
-  ["员工平均司龄", "--年"],
-];
-
-const researchItems = [
-  "国家高新技术企业",
-  "ISO 9001质量管理体系认证",
-  "HACCP体系认证",
-  "研发中心与检测中心",
-  "产学研合作平台",
-];
-
-const productGroups = [
-  ["保健食品", "胶原蛋白肽、植物营养素"],
-  ["保健器材", "健康监测、智能护理设备"],
-  ["饮妆品", "轻饮系列、精华护理"],
-  ["保洁用品", "净护系列、日常清洁"],
-];
 
 /** 根据视口计算完整设计画布的缩放比例，返回用于布局的缩放值。 */
 function useDashboardScale() {
@@ -107,19 +81,19 @@ function Panel({
   );
 }
 
-function Placeholder({
-  label,
+/** 将已授权的本地素材按固定比例展示，输入素材配置与样式名，无返回数据副作用。 */
+function MediaFrame({
+  asset,
   className = "",
 }: {
-  label: string;
+  asset: DashboardAsset;
   className?: string;
 }) {
   return (
-    <div className={`image-placeholder ${className}`} aria-label={`${label}图片占位`}>
-      <span className="placeholder-icon">▧</span>
-      <span>{label}</span>
-      <small>IMAGE PLACEHOLDER</small>
-    </div>
+    <figure className={`media-frame ${className}`}>
+      <img src={asset.src} alt={asset.alt} />
+      <figcaption>{asset.alt}</figcaption>
+    </figure>
   );
 }
 
@@ -161,13 +135,9 @@ type CountryFeature = {
 
 const globePoints: GlobePoint[] = [
   { lat: 39.08, lng: 117.2, name: "天津总部", color: "#ffd778" },
-  { lat: 51.51, lng: -0.13, name: "伦敦", color: "#33dcff" },
-  { lat: 40.71, lng: -74, name: "纽约", color: "#33dcff" },
-  { lat: -23.55, lng: -46.63, name: "圣保罗", color: "#33dcff" },
-  { lat: -26.2, lng: 28.04, name: "约翰内斯堡", color: "#33dcff" },
-  { lat: -33.87, lng: 151.21, name: "悉尼", color: "#33dcff" },
-  { lat: 55.76, lng: 37.62, name: "莫斯科", color: "#33dcff" },
-  { lat: 1.35, lng: 103.82, name: "新加坡", color: "#33dcff" },
+  { lat: 50, lng: 15, name: "欧洲业务覆盖", color: "#33dcff" },
+  { lat: 12, lng: -78, name: "美洲业务覆盖", color: "#33dcff" },
+  { lat: 2, lng: 21, name: "非洲业务覆盖", color: "#33dcff" },
 ];
 
 const globeArcs: GlobeArc[] = globePoints.slice(1).map((point) => ({
@@ -334,11 +304,7 @@ export default function Home() {
       >
         <header className="topbar">
           <div className="brand">
-            <div className="brand-mark">S</div>
-            <div>
-              <strong>和治友德</strong>
-              <span>FOHERB</span>
-            </div>
+            <img className="brand-logo" src={assets.logo.src} alt={assets.logo.alt} />
           </div>
           <div className="headline">
             <h1>和治友德全球健康产业实力数据中心</h1>
@@ -379,7 +345,7 @@ export default function Home() {
 
             <Panel title="全球运营总部（2021年正式启用）" className="hq-panel">
               <div className="hq-summary">
-                <Placeholder label="总部建筑" />
+                <MediaFrame asset={assets.headquarters} />
                 <div className="big-number">
                   <span>总部面积</span>
                   <strong>32,970.6<small>㎡</small></strong>
@@ -398,21 +364,21 @@ export default function Home() {
               </div>
             </Panel>
 
-            <Panel title="人才与团队（数据待企业提供）" className="people-panel">
+            <Panel title="企业文化与三大养生学说" className="people-panel">
               <div className="people-wrap">
                 <div className="simple-list">
-                  {people.map(([label, value]) => (
+                  {cultureItems.map(([label, value]) => (
                     <div key={label}><span>◉ {label}</span><b>{value}</b></div>
                   ))}
                 </div>
-                <Donut label={"研发及品控\n人员占比\n--%"} />
+                <Donut label={"精 · 气 · 神\n三大养生\n理论体系"} />
               </div>
             </Panel>
 
-            <Panel title="培训赋能（数据待企业提供）" className="training-panel">
+            <Panel title="培训赋能体系" className="training-panel">
               <div className="training-grid">
-                {["养生理念", "重点合作伙伴", "健康护理", "中层管理", "高级管理"].map((item) => (
-                  <div key={item}><i>▣</i><span>{item}</span><b>--场</b></div>
+                {trainingItems.map(([title, detail]) => (
+                  <div key={title}><i>▣</i><span>{title}</span><b>{detail}</b></div>
                 ))}
               </div>
             </Panel>
@@ -428,54 +394,41 @@ export default function Home() {
               <div className="map-stage">
                 <div className="region-rail region-rail-left">
                   <div className="region-card region-eu">
-                    <b>欧洲区域</b><span>客户数　--万</span><span>订单数　--万单</span>
+                    <b>欧洲区域</b><span>{regions.Europe[0]}</span><span>{regions.Europe[1]}</span>
                   </div>
                   <div className="region-card region-am">
-                    <b>美洲区域</b><span>客户数　--万</span><span>销售占比　--%</span>
+                    <b>美洲区域</b><span>{regions.Americas[0]}</span><span>{regions.Americas[1]}</span>
                   </div>
                 </div>
                 <GlobeVisualization />
                 <div className="region-rail region-rail-right">
                   <div className="region-card region-as">
-                    <b>亚洲区域</b><span>客户数　--万</span><span>订单数　--万单</span>
+                    <b>亚洲区域</b><span>{regions.Asia[0]}</span><span>{regions.Asia[1]}</span>
                   </div>
                   <div className="region-card region-af">
-                    <b>非洲区域</b><span>客户数　--万</span><span>订单数　--万单</span>
+                    <b>非洲区域</b><span>{regions.Africa[0]}</span><span>{regions.Africa[1]}</span>
                   </div>
                 </div>
               </div>
               <div className="market-ticker">
-                <h3>市场动态（今日）</h3>
-                {[
-                  ["新增国家/地区", "--个"],
-                  ["新增服务网点", "--个"],
-                  ["新增客户数", "--人"],
-                  ["新增订单数", "--单"],
-                  ["新增销售额", "--万元"],
-                ].map(([label, value]) => (
-                  <div key={label}><span>{label}</span><b>{value}</b></div>
+                <h3>全球发展节点</h3>
+                {developmentMilestones.map(([year, event]) => (
+                  <div key={year}><span>{year}</span><b>{event}</b></div>
                 ))}
               </div>
               <div className="coverage">
                 <strong>全球业务覆盖：<em>4大洲</em></strong>
-                <span>海外市场覆盖　<em>持续建设</em></span>
-                <span>合作伙伴网络　<em>持续拓展</em></span>
-                <span>累计服务家庭　<em>数以万计</em></span>
+                <span>产品研发体系　<em>3大系统</em></span>
+                <span>产学研合作　<em>3所院校</em></span>
+                <span>官网荣誉记录　<em>29项</em></span>
               </div>
             </Panel>
 
             <Panel title="智能制造与生产基地" className="factory-panel">
               <div className="factory-content">
-                <Placeholder label="生产基地鸟瞰图" className="factory-photo" />
+                <MediaFrame asset={assets.factoryRobot} className="factory-photo" />
                 <div className="factory-stats">
-                  {[
-                    ["生产基地面积", "25,928㎡"],
-                    ["自动化生产线", "--条"],
-                    ["年设计产能", "--万件"],
-                    ["当日产量", "--件"],
-                    ["产品合格率", "--%"],
-                    ["准时交付率", "--%"],
-                  ].map(([label, value]) => (
+                  {factoryFacts.map(([label, value]) => (
                     <div key={label}><span>{label}</span><b>{value}</b></div>
                   ))}
                 </div>
@@ -489,9 +442,9 @@ export default function Home() {
                     ))}
                   </div>
                   <div className="factory-images">
-                    <Placeholder label="生产车间" />
-                    <Placeholder label="检测中心" />
-                    <Placeholder label="智能仓储" />
+                    <MediaFrame asset={assets.factoryLine} />
+                    <MediaFrame asset={assets.factoryRobot} />
+                    <MediaFrame asset={assets.deviceLine} />
                   </div>
                 </div>
               </div>
@@ -514,7 +467,7 @@ export default function Home() {
               </div>
               <h3 className="subhead">产学研合作院校</h3>
               <div className="school-row">
-                {["白俄罗斯国立医科大学", "天津科技大学", "天津农学院"].map((item) => (
+                {["白俄罗斯维捷布斯克国立医药大学", "天津科技大学", "天津农学院"].map((item) => (
                   <div key={item}><i>◎</i><span>{item}</span></div>
                 ))}
               </div>
@@ -524,21 +477,22 @@ export default function Home() {
               </ul>
             </Panel>
 
-            <Panel title="专利与知识产权（数据待企业提供）" className="patent-panel">
+            <Panel title="企业荣誉与科技资质" className="patent-panel">
               <div className="patent-top">
                 <ul className="patent-list">
-                  {["发明专利", "实用新型", "外观设计", "软件著作权", "商标知识产权"].map((item, index) => (
-                    <li key={item}><i style={{ background: `var(--chart-${index + 1})` }} />{item}<b>--项</b></li>
+                  {honorItems.map((item, index) => (
+                    <li key={item}><i style={{ background: `var(--chart-${index + 1})` }} />{item}</li>
                   ))}
                 </ul>
-                <Donut label={"总计\n--项"} />
+                <MediaFrame asset={assets.worldEconomicForumHonor} className="honor-certificate" />
               </div>
-              <h3 className="subhead">近5年新增专利趋势</h3>
-              <div className="bar-chart" aria-label="近五年新增专利柱状图">
-                {[46, 56, 59, 65, 62].map((height, index) => (
-                  <div className="bar-item" key={index}>
-                    <i style={{ height: `${height}%` }} />
-                    <span>{2021 + index}</span>
+              <h3 className="subhead">代表性荣誉节点</h3>
+              <div className="honor-timeline">
+                {honorTimeline.map(([year, event]) => (
+                  <div key={year}>
+                    <i />
+                    <span>{year}</span>
+                    <b>{event}</b>
                   </div>
                 ))}
               </div>
@@ -549,52 +503,50 @@ export default function Home() {
         <section className="bottom-grid">
           <Panel title="产品矩阵（4大产品体系）" className="products-panel">
             <div className="product-grid">
-              {productGroups.map(([title, detail], index) => (
-                <article className="product-card" key={title}>
-                  <h3><i>{["♧", "◇", "♤", "❈"][index]}</i>{title}</h3>
+              {productGroups.map((group, index) => (
+                <article className="product-card" key={group.title}>
+                  <h3><i>{["♧", "◇", "♤", "❈"][index]}</i>{group.title}</h3>
                   <div className="product-content">
-                    <Placeholder label={title} />
-                    <p>{detail}<br />产品种类　--款<br />年销售量　--件<br />复购率　--%</p>
+                    <MediaFrame asset={group.image} />
+                    <p><b>{group.summary}</b><br />{group.details.map((detail) => (
+                      <span key={detail}>{detail}<br /></span>
+                    ))}</p>
                   </div>
                 </article>
               ))}
             </div>
           </Panel>
 
-          <Panel title="客户服务与培训赋能" className="service-panel">
+          <Panel title="和治友德2035战略规划目标" className="service-panel">
             <div className="service-layout">
-              <div className="simple-list">
-                {["累计服务消费者", "累计服务家庭", "累计培训合作伙伴", "全球合作伙伴", "活跃客户数"].map((item) => (
-                  <div key={item}><span>{item}</span><b>--人</b></div>
+              <div className="strategy-list">
+                {strategyGoals.map(([stage, goal]) => (
+                  <div key={stage}><strong>{stage}</strong><span>{goal}</span></div>
                 ))}
               </div>
               <div className="service-icons">
-                {["客户陪伴响应率", "客户满意度", "售后问题解决率", "客户复购率"].map((item) => (
-                  <div key={item}><i>♙</i><span>{item}</span><b>--%</b></div>
+                {["客户服务能力", "研发品控能力", "人才培训能力", "物流配送能力"].map((item) => (
+                  <div key={item}><i>♙</i><span>{item}</span><b>提质升级</b></div>
                 ))}
               </div>
             </div>
           </Panel>
 
           <div className="bottom-right">
-            <Panel title="荣誉墙（国际荣誉折合20项）" className="honor-panel">
+            <Panel title="荣誉墙（官网公开29条记录）" className="honor-panel">
               <div className="honor-row">
-                {["国家级奖项", "行业综合奖", "科技创新荣誉", "品牌公益荣誉"].map((item, index) => (
-                  <div key={item}><i>{["♕", "♛", "♜", "♔"][index]}</i><span>{item}</span><b>--项</b></div>
+                {["国家高新技术企业", "新领军者创新奖", "便携舒络仪科技金奖", "中国保健协会副理事长单位"].map((item, index) => (
+                  <div key={item}><i>{["♕", "♛", "♜", "♔"][index]}</i><span>{item}</span></div>
                 ))}
               </div>
             </Panel>
             <Panel title="公益与社会责任" className="charity-panel">
               <div className="charity-content">
-                <div>
-                  <p>累计公益投入　<span>待企业提供</span></p>
-                  <p>公益项目数量　<span>待企业提供</span></p>
-                  <p>公益覆盖国家和地区　<span>待企业提供</span></p>
-                </div>
+                <MediaFrame asset={assets.charity2020} className="charity-photo" />
                 <div className="charity-timeline">
-                  <p><b>2020年</b>　援助健康公益行动</p>
-                  <p><b>2022年</b>　关爱儿童与社区健康</p>
-                  <p><b>2023年</b>　公益健康科普活动</p>
+                  {charityMilestones.map(([year, event]) => (
+                    <p key={year}><b>{year}年</b>　{event}</p>
+                  ))}
                 </div>
               </div>
             </Panel>
@@ -602,8 +554,8 @@ export default function Home() {
         </section>
 
         <footer className="footer">
-          <span>数据展示：部分经营数据后续由企业提供</span>
-          <span>注：本页面为产业实力展示大屏，所示图片位置均为可替换占位区域</span>
+          <span>资料口径：企业官网及政府公开信息</span>
+          <span>注：规划目标不代表已实现成果，产品信息不构成医疗或功效承诺</span>
         </footer>
       </div>
     </main>
