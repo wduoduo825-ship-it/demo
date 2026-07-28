@@ -41,5 +41,6 @@ test("renders the exported health industry dashboard", async () => {
   );
   assert.match(pageCode, /智能制造与生产基地/);
   assert.match(pageCode, /生产流程/);
+  assert.doesNotMatch(pageCode, /欧洲区域|美洲区域|亚洲区域|非洲区域/);
   assert.doesNotMatch(pageCode, /研发与科技实力|企业荣誉与科技资质/);
 });

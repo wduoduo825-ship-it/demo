@@ -581,9 +581,7 @@ select {
   height: 805px;
   padding: 0 10px;
   display: grid;
-  grid-template-columns: 155px minmax(0, 1fr) 155px;
-  align-items: stretch;
-  gap: 10px;
+  place-items: center;
   overflow: hidden;
   border-radius: 7px;
   background:
@@ -608,8 +606,8 @@ select {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 600px;
-  height: 600px;
+  width: 750px;
+  height: 750px;
   transform: translate(-50%, -50%);
   border: 1px solid rgba(74, 211, 255, 0.13);
   border-radius: 50%;
@@ -617,8 +615,8 @@ select {
 }
 
 .globe-visualization::after {
-  width: 720px;
-  height: 245px;
+  width: 900px;
+  height: 310px;
   border-color: rgba(74, 211, 255, 0.11);
   transform: translate(-50%, -50%) rotate(-8deg);
 }
@@ -626,8 +624,8 @@ select {
 .globe-canvas {
   position: relative;
   z-index: 1;
-  width: 620px;
-  height: 620px;
+  width: 780px;
+  height: 780px;
   max-width: 100%;
   overflow: visible;
   cursor: grab;
@@ -725,38 +723,6 @@ select {
   font-weight: 400;
   text-shadow: none;
 }
-
-.region-card {
-  width: 100%;
-  padding: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  border: 1px solid rgba(56, 185, 255, 0.55);
-  border-radius: 6px;
-  color: #d6ebf5;
-  background: rgba(3, 35, 69, 0.88);
-  box-shadow: inset 0 0 15px rgba(25, 141, 225, 0.16);
-  font-size: 11px;
-}
-
-.region-rail {
-  position: relative;
-  z-index: 3;
-  padding: 12px 0 14px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-.region-card b {
-  color: var(--cyan);
-  font-size: 14px;
-}
-
-.region-am { border-color: #9d42d1; }
-.region-af { border-color: #d9a451; }
-.region-as { border-color: #22c17b; }
 
 .market-ticker {
   height: 90px;

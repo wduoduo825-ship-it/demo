@@ -10,7 +10,6 @@ import {
   metrics,
   overview,
   productGroups,
-  regions,
   trainingItems,
   type DashboardAsset,
 } from "./foherb-content";
@@ -207,8 +206,8 @@ function GlobeVisualization() {
         animateIn: false,
         rendererConfig: { alpha: true, antialias: true },
       })
-        .width(620)
-        .height(620)
+        .width(780)
+        .height(780)
         .backgroundColor("rgba(0, 0, 0, 0)")
         .globeImageUrl("./earth-night.jpg")
         .showGraticules(true)
@@ -280,7 +279,8 @@ function GlobeVisualization() {
           element.classList.toggle("is-hidden", !isVisible);
         })
         .htmlTransitionDuration(0)
-        .pointOfView({ lat: 24, lng: 108, altitude: 1.72 }, 0);
+        // 拉近镜头，让地球成为全球市场版图的视觉主体。
+        .pointOfView({ lat: 24, lng: 108, altitude: 1.45 }, 0);
 
       const controls = globe.controls();
       controls.autoRotate = !reducedMotion;
@@ -431,23 +431,7 @@ export default function Home() {
                 <span><i className="blue-dot" />经销服务网点</span>
               </div>
               <div className="map-stage">
-                <div className="region-rail region-rail-left">
-                  <div className="region-card region-eu">
-                    <b>欧洲区域</b><span>{regions.Europe[0]}</span><span>{regions.Europe[1]}</span>
-                  </div>
-                  <div className="region-card region-am">
-                    <b>美洲区域</b><span>{regions.Americas[0]}</span><span>{regions.Americas[1]}</span>
-                  </div>
-                </div>
                 <GlobeVisualization />
-                <div className="region-rail region-rail-right">
-                  <div className="region-card region-as">
-                    <b>亚洲区域</b><span>{regions.Asia[0]}</span><span>{regions.Asia[1]}</span>
-                  </div>
-                  <div className="region-card region-af">
-                    <b>非洲区域</b><span>{regions.Africa[0]}</span><span>{regions.Africa[1]}</span>
-                  </div>
-                </div>
               </div>
               <div className="market-ticker">
                 <h3>全球发展节点</h3>
