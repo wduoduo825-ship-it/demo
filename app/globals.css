@@ -211,8 +211,26 @@ select {
 .metric-value strong {
   color: var(--gold);
   font-size: 40px;
+  font-variant-numeric: tabular-nums;
   letter-spacing: -1px;
   text-shadow: 0 0 8px rgba(255, 193, 81, 0.32);
+}
+
+.metric-number {
+  display: inline-grid;
+}
+
+.metric-number-space,
+.metric-number-live {
+  grid-area: 1 / 1;
+}
+
+.metric-number-space {
+  visibility: hidden;
+}
+
+.metric-number-live {
+  justify-self: end;
 }
 
 .metric-card p {

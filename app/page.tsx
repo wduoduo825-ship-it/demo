@@ -16,6 +16,7 @@ import {
 
 const DESIGN_WIDTH = 2048;
 const DESIGN_HEIGHT = 1875;
+const METRIC_ANIMATION_DURATION = 1800;
 
 /** 根据视口计算完整设计画布的缩放比例，返回用于布局的缩放值。 */
 function useDashboardScale() {
@@ -60,6 +61,75 @@ function useClock() {
   const time = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
   const week = `星期${"日一二三四五六"[now.getDay()]}`;
   return { date, time, week };
+}
+
+/** 首屏生成统一的数字增长进度；减少动态效果时直接返回完成状态。 */
+function useMetricAnimationProgress() {
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    let frame = 0;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      frame = window.requestAnimationFrame(() => setProgress(1));
+      return () => window.cancelAnimationFrame(frame);
+    }
+
+    let startedAt: number | null = null;
+    const animate = (timestamp: number) => {
+      startedAt ??= timestamp;
+      const linearProgress = Math.min(
+        (timestamp - startedAt) / METRIC_ANIMATION_DURATION,
+        1,
+      );
+      // 三次缓出使数字前段增长明显、接近目标时自然减速。
+      setProgress(1 - (1 - linearProgress) ** 3);
+      if (linearProgress < 1) {
+        frame = window.requestAnimationFrame(animate);
+      }
+    };
+
+    frame = window.requestAnimationFrame(animate);
+    return () => window.cancelAnimationFrame(frame);
+  }, []);
+
+  return progress;
+}
+
+/** 按原始千分位、小数精度和单位格式化当前动画数值。 */
+function formatAnimatedMetric(value: string, progress: number) {
+  const match = value.match(/^([\d,]+(?:\.\d+)?)(.*)$/);
+  if (!match) return value;
+
+  const [, numericText, suffix] = match;
+  const target = Number(numericText.replaceAll(",", ""));
+  const decimalPlaces = numericText.split(".")[1]?.length ?? 0;
+  const precision = 10 ** decimalPlaces;
+  const current =
+    progress >= 1
+      ? target
+      : Math.round(target * progress * precision) / precision;
+
+  return `${current.toLocaleString("zh-CN", {
+    minimumFractionDigits: decimalPlaces,
+    maximumFractionDigits: decimalPlaces,
+  })}${suffix}`;
+}
+
+function AnimatedMetricValue({
+  value,
+  progress,
+}: {
+  value: string;
+  progress: number;
+}) {
+  return (
+    <strong className="metric-number" aria-label={value}>
+      <span className="metric-number-space" aria-hidden="true">{value}</span>
+      <span className="metric-number-live" aria-hidden="true">
+        {formatAnimatedMetric(value, progress)}
+      </span>
+    </strong>
+  );
 }
 
 function Panel({
@@ -331,6 +401,7 @@ function HonorWall() {
 export default function Home() {
   const scale = useDashboardScale();
   const clock = useClock();
+  const metricProgress = useMetricAnimationProgress();
 
   return (
     <main
@@ -360,7 +431,7 @@ export default function Home() {
             <article className="metric-card" key={label}>
               <div className="metric-value">
                 <span className="metric-icon">{icon}</span>
-                <strong>{value}</strong>
+                <AnimatedMetricValue value={value} progress={metricProgress} />
               </div>
               <p>{label}</p>
               <span className="metric-glow" />
