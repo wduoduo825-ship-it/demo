@@ -49,6 +49,10 @@ test("renders the exported health industry dashboard", async () => {
     new URL(`../pages/assets/${pageBundle}`, import.meta.url),
     "utf8",
   );
+  const sourceStyles = await readFile(
+    new URL("../app/globals.css", import.meta.url),
+    "utf8",
+  );
   assert.match(pageCode, /智能制造与生产基地/);
   assert.match(pageCode, /生产流程/);
   assert.match(pageCode, /metric-number-live/);
@@ -58,4 +62,12 @@ test("renders the exported health industry dashboard", async () => {
   assert.doesNotMatch(pageCode, /产学研合作院校/);
   assert.doesNotMatch(pageCode, /欧洲区域|美洲区域|亚洲区域|非洲区域/);
   assert.doesNotMatch(pageCode, /研发与科技实力|企业荣誉与科技资质/);
+  assert.match(
+    sourceStyles,
+    /\.product-content\s*{[\s\S]*?grid-template-rows:\s*165px minmax\(0, 1fr\)/,
+  );
+  assert.match(
+    sourceStyles,
+    /\.product-content \.media-frame img\s*{[\s\S]*?object-fit:\s*contain/,
+  );
 });
