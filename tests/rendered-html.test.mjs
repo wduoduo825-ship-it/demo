@@ -13,6 +13,16 @@ test("renders the exported health industry dashboard", async () => {
   assert.match(html, /class="globe-canvas"/);
   assert.match(html, /智能制造与生产基地/);
   assert.match(html, /产品矩阵/);
+  assert.match(html, /class="metric-number-live"/);
+  const metricSection = html.match(
+    /<section class="metrics"[\s\S]*?<\/section>/,
+  )?.[0];
+  assert.ok(metricSection, "missing exported metric section");
+  assert.equal(
+    (metricSection.match(/class="metric-card"/g) ?? []).length,
+    7,
+  );
+  assert.doesNotMatch(metricSection, /产学研合作院校|2,007年/);
   assert.match(html, /\/demo\/assets\/page-[\w-]+\.js/);
   assert.doesNotMatch(html, /codex-preview|react-loading-skeleton/i);
 

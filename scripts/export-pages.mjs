@@ -11,6 +11,38 @@ import {
 const clientAssets = new URL("../dist/client/assets/", import.meta.url);
 const pagesRoot = new URL("../pages/", import.meta.url);
 
+/** 转义静态骨架中的指标文本，避免配置内容被解释为 HTML。 */
+function escapeHtml(value) {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
+}
+
+/** 从现有指标配置生成与客户端首帧一致的静态 HTML。 */
+async function renderMetricsSkeleton() {
+  const source = await readFile(
+    new URL("../app/foherb-content.ts", import.meta.url),
+    "utf8",
+  );
+  const block = source.match(/export const metrics = \[([\s\S]*?)\] as const;/);
+  if (!block) throw new Error("无法读取核心指标配置");
+
+  const entries = [...block[1].matchAll(/\["([^"]+)", "([^"]+)", "([^"]+)"\]/g)];
+  if (!entries.length) throw new Error("核心指标配置为空");
+
+  const cards = entries.map(([, icon, value, label]) => {
+    const numeric = value.match(/^([\d,]+(?:\.(\d+))?)(.*)$/);
+    const initialValue = numeric
+      ? `${numeric[2] ? `0.${"0".repeat(numeric[2].length)}` : "0"}${numeric[3]}`
+      : value;
+    return `<article class="metric-card"><div class="metric-value"><span class="metric-icon">${escapeHtml(icon)}</span><strong class="metric-number" aria-label="${escapeHtml(value)}"><span class="metric-number-space" aria-hidden="true">${escapeHtml(value)}</span><span class="metric-number-live" aria-hidden="true">${escapeHtml(initialValue)}</span></strong></div><p>${escapeHtml(label)}</p><span class="metric-glow"></span></article>`;
+  });
+
+  return `<section class="metrics" aria-label="核心指标">${cards.join("")}</section>`;
+}
+
 /**
  * 用已验证的静态页面骨架更新构建资源，返回值写入 pages/index.html。
  * 这样可避开 vinext 当前 SSR 导出器对浏览器预加载代码的误执行。
@@ -36,9 +68,14 @@ async function exportGitHubPages() {
   };
 
   let html = await readFile(new URL("index.html", pagesRoot), "utf8");
+  const metricsSkeleton = await renderMetricsSkeleton();
 
-  // 保留客户端水合资源，使 WebGL 地球在 GitHub Pages 上仍可旋转和拖拽。
+  // 同步当前指标骨架并保留客户端水合资源，避免 GitHub 首屏短暂显示旧数据。
   html = html
+    .replace(
+      /<section class="metrics" aria-label="核心指标">[\s\S]*?<\/section><section class="main-grid">/,
+      `${metricsSkeleton}<section class="main-grid">`,
+    )
     .replace(/framework-[\w-]+\.js/g, chunkFiles.framework)
     .replace(/rolldown-runtime-[\w-]+\.js/g, chunkFiles.runtime)
     .replace(/layout-segment-context-[\w-]+\.js/g, chunkFiles.layout)
