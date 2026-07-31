@@ -44,6 +44,8 @@ test("renders the exported health industry dashboard", async () => {
   assert.match(pageCode, /metric-number-live/);
   assert.match(pageCode, /prefers-reduced-motion: reduce/);
   assert.match(pageCode, /32,970\.6㎡/);
+  assert.match(pageCode, /useGrouping/);
+  assert.doesNotMatch(pageCode, /产学研合作院校/);
   assert.doesNotMatch(pageCode, /欧洲区域|美洲区域|亚洲区域|非洲区域/);
   assert.doesNotMatch(pageCode, /研发与科技实力|企业荣誉与科技资质/);
 });

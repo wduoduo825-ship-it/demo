@@ -112,6 +112,8 @@ function formatAnimatedMetric(value: string, progress: number) {
   return `${current.toLocaleString("zh-CN", {
     minimumFractionDigits: decimalPlaces,
     maximumFractionDigits: decimalPlaces,
+    // 仅当原始数据含千分位时才分组，避免 2007年变成 2,007年。
+    useGrouping: numericText.includes(","),
   })}${suffix}`;
 }
 
